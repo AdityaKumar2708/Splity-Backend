@@ -1,0 +1,10 @@
+.gradle
+build
+.git
+.idea
+.vscode
+.junie
+bin
+uploads
+local.properties
+.DS_Store
