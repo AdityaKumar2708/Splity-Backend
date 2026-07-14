@@ -23,15 +23,26 @@ public class AuthController {
             @RequestBody FirebaseLoginRequest request) {
 
         try {
+
+            System.out.println("STEP 1");
+
             FirebaseToken decodedToken =
                     FirebaseAuth.getInstance().verifyIdToken(request.getIdToken());
 
+            System.out.println("STEP 2");
+
             User user = userAuthService.getOrCreateUser(decodedToken);
+
+            System.out.println("STEP 3");
 
             return ResponseEntity.ok(user);
 
         } catch (Exception e) {
-            return ResponseEntity.status(401).body("Invalid Firebase Token");
+
+            System.out.println("STEP ERROR");
+            e.printStackTrace();
+
+            return ResponseEntity.status(500).body(e.toString());
         }
     }
 

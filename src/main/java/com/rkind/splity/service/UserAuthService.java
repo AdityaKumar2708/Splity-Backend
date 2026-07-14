@@ -18,19 +18,31 @@ public class UserAuthService {
 
     public User getOrCreateUser(FirebaseToken token) {
 
-    String firebaseUid = token.getUid();
-    String phone = (String) token.getClaims().get("phone_number");
+        System.out.println("SERVICE 1");
 
-    return userRepository.findByFirebaseUid(firebaseUid)
-            .orElseGet(() -> {
+        String firebaseUid = token.getUid();
+        String phone = (String) token.getClaims().get("phone_number");
 
-                User user = new User();
-                user.setFirebaseUid(firebaseUid);
-                user.setPhoneNumber(phone);
-                user.setCreatedAt(LocalDateTime.now());
+        System.out.println("SERVICE 2");
 
-                return userRepository.save(user);
-            });
-}
+        User user = userRepository.findByFirebaseUid(firebaseUid)
+                .orElseGet(() -> {
+
+                    System.out.println("SERVICE 3");
+
+                    User u = new User();
+                    u.setFirebaseUid(firebaseUid);
+                    u.setPhoneNumber(phone);
+                    u.setCreatedAt(LocalDateTime.now());
+
+                    System.out.println("SERVICE 4");
+
+                    return userRepository.save(u);
+                });
+
+        System.out.println("SERVICE 5");
+
+        return user;
+    }
 
 }
