@@ -40,12 +40,12 @@ public class FirebaseConfig {
 
         } catch (Exception e) {
 
-            throw new RuntimeException(
-                    "Failed to initialize Firebase",
-                    e
-            );
+        System.err.println("========== FIREBASE ERROR ==========");
+        e.printStackTrace();
+        System.err.println("====================================");
 
-        }
+        throw new RuntimeException("Failed to initialize Firebase", e);
+    }
 
     }
 
