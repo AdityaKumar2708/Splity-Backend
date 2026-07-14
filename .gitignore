@@ -41,5 +41,4 @@ uploads/
 local.properties
 .DS_Store
 .junie/
-src/main/resources/firebase/firebase-service-account.json
 
