@@ -92,7 +92,7 @@ public class GroupController {
 
         result.put(
                 "url",
-                "http://10.16.251.94:8080/uploads/documents/" + newFileName
+                "http://10.120.4.94:8080/uploads/documents/" + newFileName
         );
 
         result.put(
@@ -144,7 +144,7 @@ public class GroupController {
 
         result.put(
                 "url",
-                "http://10.16.251.94:8080/uploads/audio/" + newFileName
+                "http://10.120.4.94:8080/uploads/audio/" + newFileName
         );
 
         result.put("fileName", originalName);
@@ -290,7 +290,7 @@ public class GroupController {
 
         result.put(
                 "url",
-                "http://10.16.251.94:8080/uploads/videos/" + newFileName
+                "http://10.120.4.94:8080/uploads/videos/" + newFileName
         );
 
         result.put("fileName", originalName);
@@ -359,11 +359,18 @@ public class GroupController {
 
         } catch (Exception e) {
 
-            e.printStackTrace();   // <-- sabse important
+            e.printStackTrace();
 
             return ResponseEntity.badRequest()
                     .body(e.getMessage());
         }
+    }
+
+    @PutMapping("/update-profile")
+    public Group updateGroupProfile(
+            @RequestBody UpdateGroupProfileRequest request) {
+
+        return groupService.updateGroupProfile(request);
     }
 
 }

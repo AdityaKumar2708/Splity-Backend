@@ -7,6 +7,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "group_members")
@@ -15,6 +18,9 @@ public class GroupMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long groupId;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private GroupRole role;
     private Long userId;
     private LocalDateTime joinedAt;
 
@@ -47,5 +53,12 @@ public class GroupMember {
 
     public void setJoinedAt(LocalDateTime joinedAt) {
         this.joinedAt = joinedAt;
+    }
+    public GroupRole getRole() {
+        return role;
+    }
+
+    public void setRole(GroupRole role) {
+        this.role = role;
     }
 }

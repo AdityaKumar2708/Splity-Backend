@@ -54,4 +54,49 @@ public class FirebaseNotificationService {
 
         }
     }
+
+    public void sendLoginApprovalNotification(
+            String token,
+            Long requestId
+    ) {
+
+        if (token == null || token.trim().isEmpty()) {
+            System.out.println("FCM Token is empty.");
+            return;
+        }
+
+        try {
+
+            Message message = Message.builder()
+                    .setToken(token)
+
+                    .putData("type", "LOGIN_APPROVAL")
+                    .putData("requestId", String.valueOf(requestId))
+                    .putData("title", "It's you?")
+                    .putData(
+                            "body",
+                            "A new login attempt was detected. Was this you?"
+                    )
+
+                    .build();
+
+            String response =
+                    FirebaseMessaging.getInstance().send(message);
+
+            System.out.println("================================");
+            System.out.println("LOGIN APPROVAL NOTIFICATION SENT");
+            System.out.println("Token     : " + token);
+            System.out.println("Request ID: " + requestId);
+            System.out.println("Response  : " + response);
+            System.out.println("================================");
+
+        } catch (Exception e) {
+
+            System.out.println("================================");
+            System.out.println("LOGIN APPROVAL FCM SEND FAILED");
+            e.printStackTrace();
+            System.out.println("================================");
+
+        }
+    }
 }

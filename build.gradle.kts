@@ -35,6 +35,16 @@ dependencies {
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	implementation("com.razorpay:razorpay-java:1.4.8")
+	implementation ("org.springframework.boot:spring-boot-starter-mail")
+	implementation("org.springframework.security:spring-security-crypto")
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+	compileOnly("org.projectlombok:lombok:1.18.38")
+	annotationProcessor("org.projectlombok:lombok:1.18.38")
+
+	testCompileOnly("org.projectlombok:lombok:1.18.38")
+	testAnnotationProcessor("org.projectlombok:lombok:1.18.38")
 }
 
 tasks.withType<Test> {

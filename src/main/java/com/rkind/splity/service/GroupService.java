@@ -16,6 +16,9 @@ import java.util.stream.Collectors;
 import com.rkind.splity.repository.PollRepository;
 import com.rkind.splity.repository.PollOptionRepository;
 import com.rkind.splity.repository.PollVoteRepository;
+import com.rkind.splity.dto.group.TransferLeaderRequest;
+import com.rkind.splity.dto.group.TransferLeaderResponse;
+import com.rkind.splity.entity.GroupRole;
 
 @Service
 public class GroupService {
@@ -74,6 +77,7 @@ public class GroupService {
         group.setCode(code);
         group.setDpUrl(dpUrl);
         group.setCreatedBy(userId);
+        group.setLeaderId(userId);
         group.setCreatedAt(LocalDateTime.now());
 
         System.out.println("NAME = " + group.getName());
@@ -84,9 +88,11 @@ public class GroupService {
         groupRepository.save(group);
 
         GroupMember member = new GroupMember();
+
         member.setGroupId(group.getId());
         member.setUserId(userId);
         member.setJoinedAt(LocalDateTime.now());
+        member.setRole(GroupRole.LEADER);
 
         groupMemberRepository.save(member);
 
@@ -345,6 +351,11 @@ public class GroupService {
 
     public GroupMessageResponseDto sendMessage(SendGroupMessageRequest request) {
 
+        System.out.println("====================================");
+        System.out.println("ReplyId From Request = " + request.getReplyToMessageId());
+        System.out.println("Message = " + request.getMessageText());
+        System.out.println("====================================");
+
         validateMembership(request.getGroupId(), request.getSenderId());
 
         if (request.getMessageText() == null || request.getMessageText().isEmpty()) {
@@ -489,6 +500,23 @@ public class GroupService {
     }
 
     private GroupMessageResponseDto toMessageDto(GroupMessage message, Long currentUserId) {
+
+        System.out.println("========== REPLY DEBUG ==========");
+        System.out.println("Message ID = " + message.getId());
+        System.out.println("Message = " + message.getMessageText());
+        System.out.println("ReplyId = " + message.getReplyToMessageId());
+
+        if (message.getReplyToMessageId() != null) {
+
+            groupMessageRepository.findById(message.getReplyToMessageId())
+                    .ifPresent(reply -> {
+
+                        System.out.println("Reply Message = " + reply.getMessageText());
+
+                    });
+
+        }
+
         GroupMessageResponseDto dto = new GroupMessageResponseDto();
         dto.setId(message.getId());
         dto.setGroupId(message.getGroupId());
@@ -569,8 +597,29 @@ public class GroupService {
         }
 
         if (message.getReplyToMessageId() != null) {
+
             groupMessageRepository.findById(message.getReplyToMessageId()).ifPresent(reply -> {
+
                 dto.setReplyToMessageText(reply.getMessageText());
+
+                dto.setReplyToMessageType(reply.getMessageType());
+
+                User replySender =
+                        userRepository.findById(reply.getSenderId()).orElse(null);
+
+                if (replySender != null) {
+
+                    if (currentUserId != null &&
+                            currentUserId.equals(reply.getSenderId())) {
+
+                        dto.setReplyToSenderName("You");
+
+                    } else {
+
+                        dto.setReplyToSenderName(replySender.getPhoneNumber());
+                    }
+
+                }
             });
         }
 
@@ -1020,5 +1069,77 @@ public class GroupService {
             );
 
         }
+    }
+
+    public Group updateGroupProfile(UpdateGroupProfileRequest request) {
+
+        Group group = groupRepository.findById(request.getGroupId())
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        // Only group admin can update profile
+        if (!group.getCreatedBy().equals(request.getUserId())) {
+            throw new RuntimeException("Only group admin can update group profile");
+        }
+
+        if (request.getName() != null && !request.getName().trim().isEmpty()) {
+            group.setName(request.getName().trim());
+        }
+
+        if (request.getDpUrl() != null) {
+            group.setDpUrl(request.getDpUrl());
+        }
+        
+        if (request.getCoverImageUrl() != null) {
+            group.setCoverImageUrl(request.getCoverImageUrl());
+        }
+
+        return groupRepository.save(group);
+    }
+
+    public TransferLeaderResponse transferLeader(TransferLeaderRequest request) {
+
+        Long groupId = request.getGroupId();
+        Long currentLeaderId = request.getCurrentLeaderId();
+        Long newLeaderId = request.getNewLeaderId();
+
+        if (groupId == null || currentLeaderId == null || newLeaderId == null) {
+            throw new RuntimeException("Group ID, current leader ID and new leader ID are required");
+        }
+
+        if (currentLeaderId.equals(newLeaderId)) {
+            throw new RuntimeException("Current leader and new leader cannot be the same");
+        }
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        if (!group.getLeaderId().equals(currentLeaderId)) {
+            throw new RuntimeException("Only the current leader can transfer leadership");
+        }
+
+        GroupMember currentLeader = groupMemberRepository
+                .findByUserIdAndGroupId(currentLeaderId, groupId)
+                .orElseThrow(() -> new RuntimeException("Current leader is not a group member"));
+
+        GroupMember newLeader = groupMemberRepository
+                .findByUserIdAndGroupId(newLeaderId, groupId)
+                .orElseThrow(() -> new RuntimeException("New leader must be a group member"));
+
+        currentLeader.setRole(GroupRole.MEMBER);
+        newLeader.setRole(GroupRole.LEADER);
+
+        groupMemberRepository.save(currentLeader);
+        groupMemberRepository.save(newLeader);
+
+        group.setLeaderId(newLeaderId);
+
+        groupRepository.save(group);
+
+
+        return new TransferLeaderResponse(
+                true,
+                "Leadership transferred successfully",
+                newLeaderId
+        );
     }
 }

@@ -11,14 +11,9 @@ import java.util.Optional;
 public interface GroupMemberRepository
         extends JpaRepository<GroupMember, Long> {
 
-    // Used to decide:
-    // open ViewGroupActivity OR GroupOptionActivity
     boolean existsByUserId(Long userId);
-
-    // Used to prevent duplicate join in same group
     boolean existsByUserIdAndGroupId(Long userId, Long groupId);
 
-    // Used to load all groups of a user (View Group screen)
     List<GroupMember> findAllByUserId(Long userId);
 
     List<GroupMember> findAllByGroupId(Long groupId);

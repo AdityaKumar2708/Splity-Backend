@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
@@ -21,11 +22,38 @@ public class FirebaseConfig {
                 return;
             }
 
-            InputStream serviceAccount =
-                    new FileInputStream("/etc/secrets/firebase-service-account.json");
+            InputStream serviceAccount;
+
+            File renderFile =
+                    new File("/etc/secrets/firebase-service-account.json");
+
+            if (renderFile.exists()) {
+
+                System.out.println("Using Render Firebase Secret");
+
+                serviceAccount =
+                        new FileInputStream(renderFile);
+
+            } else {
+
+                System.out.println("Using Local Firebase JSON");
+
+                serviceAccount =
+                        getClass().getClassLoader().getResourceAsStream(
+                                "firebase/firebase-service-account.json"
+                        );
+
+                if (serviceAccount == null) {
+                    throw new RuntimeException(
+                            "firebase-service-account.json not found in resources/firebase"
+                    );
+                }
+            }
 
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setCredentials(
+                            GoogleCredentials.fromStream(serviceAccount)
+                    )
                     .build();
 
             FirebaseApp.initializeApp(options);

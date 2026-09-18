@@ -19,7 +19,13 @@ public class Group {
     @Column(name = "dp_url", columnDefinition = "TEXT")
     private String dpUrl;
 
+    @Column(name = "cover_image_url", columnDefinition = "TEXT")
+    private String coverImageUrl;
+
     private Long createdBy;
+
+    @Column(nullable = false)
+    private Long leaderId;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -84,4 +90,20 @@ public void setDescription(String description) {
     this.description = description;
 }
 
+    public String getCoverImageUrl() {
+        return coverImageUrl;
+    }
+
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
+    }
+
+
+    public Long getLeaderId() {
+        return leaderId;
+    }
+
+    public void setLeaderId(Long leaderId) {
+        this.leaderId = leaderId;
+    }
 }

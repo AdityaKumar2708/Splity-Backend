@@ -23,6 +23,9 @@ public class GroupMessageResponseDto {
     private String reaction;
     private String createdAt;
 
+    private String replyToSenderName;
+    private String replyToMessageType;
+
     private PollResponseDto poll;
 
     private boolean mine;
@@ -153,5 +156,21 @@ public class GroupMessageResponseDto {
 
     public void setPoll(PollResponseDto poll) {
         this.poll = poll;
+    }
+
+    public String getReplyToSenderName() {
+        return replyToSenderName;
+    }
+
+    public void setReplyToSenderName(String replyToSenderName) {
+        this.replyToSenderName = replyToSenderName;
+    }
+
+    public String getReplyToMessageType() {
+        return replyToMessageType;
+    }
+
+    public void setReplyToMessageType(String replyToMessageType) {
+        this.replyToMessageType = replyToMessageType;
     }
 }
